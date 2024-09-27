@@ -11,10 +11,73 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "uarray2.h"
-// #include "pnmrdr.h"
+
+void fill_array(FILE *input, UArray2_T arr) {
+    int value;
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < 9; j++) {
+            fscanf(input, "%d", &value);
+            int *element = UArray2_at(arr, i, j);
+            *element = value;
+        }
+    }
+}
+
+
+int validate_sudoku(UArray2_T arr) {
+    int test_array[9];
+
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < 9; j++) {
+            test_array[j] = *(int *)UArray2_at(arr, i, j);
+        }
+        if (!validate_section(test_array)) {
+            return 0;
+        }
+    }
+
+    for (int j = 0; j < 9; j++) {
+        for (int i = 0; i < 9; i++) {
+            test_array[i] = *(int *)UArray2_at(arr, i, j);
+        }
+        if (!validate_section(test_array)) {
+            return 0;
+        }
+    }
+
+    for (int grid_row = 0; grid_row < 3; grid_row++) {
+        for (int grid_col = 0; grid_col < 3; grid_col++) {
+            int index = 0;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    test_array[index++] = *(int *)UArray2_at(arr, grid_row * 3 + i, grid_col * 3 + j);
+                }
+            }
+            if (!validate_section(test_array)) {
+                return 0;
+            }
+        }
+    }
+
+    return 1;
+}
+
+
+int validate_section(int arr[]) {
+    int seen[9] = {0};
+    for (int i = 0; i < 9; i++) {
+        if (arr[i] < 1 || arr[i] > 9 || seen[arr[i] - 1] != 0) {
+            return 0;
+        }
+        seen[arr[i] - 1] = 1;
+    }
+    return 1;
+}
+
 
 int main(int argc, char *argv[]) {
     assert(argc < 3);
+
     FILE *sudoku;
     if (argc == 2) {
         sudoku = fopen(argv[1], "r");
@@ -23,14 +86,22 @@ int main(int argc, char *argv[]) {
         sudoku = stdin;
     }
 
-    UArray2_T newArr = UArray2_new(9, 9, 4);
-    // fill the array
+    UArray2_T newArr = UArray2_new(9, 9, sizeof(int));
 
+    fill_array(sudoku, newArr);
 
-    int test_array[9];
-    int is_valid = 1;
+    int is_valid = validate_sudoku(newArr);
 
+    if (is_valid) {
+        printf("The Sudoku puzzle is valid!\n");
+    } else {
+        printf("The Sudoku puzzle is invalid!\n");
+    }
 
+    UArray2_free(&newArr);
+    if (argc == 2) {
+        fclose(sudoku);
+    }
 
     return 0;
 }
