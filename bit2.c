@@ -19,6 +19,8 @@ struct Bit2_T {
 
 // Create a new Bit2 array
 Bit2_T Bit2_new(int width, int height) {
+    assert(width > 0 && height > 0);  // Ensure valid dimensions
+
     Bit2_T bit2 = malloc(sizeof(*bit2));
     assert(bit2 != NULL);  // Ensure the structure was allocated
 
@@ -94,4 +96,3 @@ void Bit2_map_col_major(Bit2_T array, void apply(int i, int j, Bit2_T a, int val
         }
     }
 }
-
