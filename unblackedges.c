@@ -28,7 +28,10 @@ int is_adjacent(Coordinate *black_squares, int count, int row, int col) {
 }
 
 // Apply function for row-major mapping, checking for adjacent black squares
-void apply_row_major(int i, int j, Bit2_T bit2, int value, void *cl) {
+void apply_row_major(void *element, void *cl, int i, int j) {
+    Bit2_T bit2 = (Bit2_T)cl;
+    int value = *(int *)element;
+
     if (value == 1) {  // If this square is black
         if (is_adjacent(black_squares, black_square_count, i, j)) {
             black_squares[black_square_count++] = (Coordinate){i, j};
@@ -112,7 +115,7 @@ int main(int argc, char *argv[]) {
     process_perimeter(pbm_array);
 
     // Apply function in row-major order
-    Bit2_map_row_major(pbm_array, apply_row_major, NULL);
+    Bit2_map_row_major(pbm_array, apply_row_major, pbm_array);
 
     print_pbm(pbm_array);
 
