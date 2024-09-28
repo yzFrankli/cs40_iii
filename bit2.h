@@ -9,7 +9,7 @@
 #ifndef BIT2_H
 #define BIT2_H
 
-#include <uarray.h>  // Include necessary libraries
+#include <uarray.h>
 
 // Define the Bit2 structure only once
 typedef struct Bit2 {
