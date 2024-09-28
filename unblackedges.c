@@ -3,98 +3,102 @@
 #include <assert.h>
 #include <string.h>
 #include "bit2.h"
+#include "stack.h"  // Include Hanson's stack
 
 typedef struct {
     int row;
     int col;
 } Coordinate;
 
-#define INITIAL_BLACK_SQUARES 100  // Initial size of the black squares array
-
-Coordinate *black_squares = NULL;
-int black_square_count = 0;
-int max_black_squares = INITIAL_BLACK_SQUARES;
 Bit2_T pbm_array;
 
-// Function to dynamically add a black square
-void add_black_square(int row, int col) {
-    // If we've reached the limit, resize the array
-    if (black_square_count >= max_black_squares) {
-        max_black_squares *= 2;  // Double the size of the array
-        black_squares = realloc(black_squares, max_black_squares * sizeof(Coordinate));
-        if (black_squares == NULL) {
-            fprintf(stderr, "Memory allocation failed!\n");
-            exit(1);
-        }
-        printf("Resized black_squares array to %d elements\n", max_black_squares);
-    }
-
-    // Add the new black square
-    black_squares[black_square_count].row = row;
-    black_squares[black_square_count].col = col;
-    black_square_count++;
-}
-
-// Function to check if a black square is adjacent to any squares in the array
-int is_adjacent(Coordinate *black_squares, int count, int row, int col) {
-    for (int i = 0; i < count; i++) {
-        int r = black_squares[i].row;
-        int c = black_squares[i].col;
-
-        if ((abs(r - row) <= 1) && (abs(c - col) <= 1)) {
-            return 1;  // Found an adjacent black square
-        }
-    }
-    return 0;
-}
-
-// Apply function for row-major mapping, checking for adjacent black squares
-void apply_row_major(int i, int j, Bit2_T bit2, int value, void *cl) {
-    (void)cl;  // Unused parameter
-
-    if (value == 1) {  // If this square is black
-        if (is_adjacent(black_squares, black_square_count, i, j)) {
-            add_black_square(i, j);  // Dynamically add black square
-            Bit2_put(bit2, i, j, 0);  // Turn white
-            printf("Turned white at (%d, %d)\n", i, j);  // Debugging output
-        }
-    }
-}
-
-// Function to process the perimeter of the PBM array
-void process_perimeter(Bit2_T bit2) {
+// Function to add adjacent black squares to the stack
+void push_adjacent_black_squares(Bit2_T bit2, Stack_T stack, int row, int col) {
     int rows = Bit2_height(bit2);
     int columns = Bit2_width(bit2);
 
-    printf("Processing perimeter: rows=%d, columns=%d\n", rows, columns);
+    // Check each adjacent square (up, down, left, right) and push onto the stack if it's black
+    if (row > 0 && Bit2_get(bit2, row - 1, col) == 1) {  // Up
+        Coordinate *coord = malloc(sizeof(Coordinate));
+        coord->row = row - 1;
+        coord->col = col;
+        Stack_push(stack, coord);
+        Bit2_put(bit2, row - 1, col, 0);  // Turn white
+    }
+    if (row < rows - 1 && Bit2_get(bit2, row + 1, col) == 1) {  // Down
+        Coordinate *coord = malloc(sizeof(Coordinate));
+        coord->row = row + 1;
+        coord->col = col;
+        Stack_push(stack, coord);
+        Bit2_put(bit2, row + 1, col, 0);  // Turn white
+    }
+    if (col > 0 && Bit2_get(bit2, row, col - 1) == 1) {  // Left
+        Coordinate *coord = malloc(sizeof(Coordinate));
+        coord->row = row;
+        coord->col = col - 1;
+        Stack_push(stack, coord);
+        Bit2_put(bit2, row, col - 1, 0);  // Turn white
+    }
+    if (col < columns - 1 && Bit2_get(bit2, row, col + 1) == 1) {  // Right
+        Coordinate *coord = malloc(sizeof(Coordinate));
+        coord->row = row;
+        coord->col = col + 1;
+        Stack_push(stack, coord);
+        Bit2_put(bit2, row, col + 1, 0);  // Turn white
+    }
+}
+
+// Function to process the perimeter of the PBM array and push black squares onto the stack
+void process_perimeter(Bit2_T bit2) {
+    int rows = Bit2_height(bit2);
+    int columns = Bit2_width(bit2);
+    Stack_T stack = Stack_new();  // Create Hanson's stack
 
     // Process the top and bottom rows
     for (int j = 0; j < columns; j++) {
-        if (Bit2_get(bit2, 0, j) == 1) {  // Top row check
-            add_black_square(0, j);
+        if (Bit2_get(bit2, 0, j) == 1) {  // Top row
+            Coordinate *coord = malloc(sizeof(Coordinate));
+            coord->row = 0;
+            coord->col = j;
+            Stack_push(stack, coord);
             Bit2_put(bit2, 0, j, 0);  // Turn white
-            printf("Turned white at top row (0, %d)\n", j);
         }
-        if (Bit2_get(bit2, rows - 1, j) == 1) {  // Bottom row check
-            add_black_square(rows - 1, j);
+        if (Bit2_get(bit2, rows - 1, j) == 1) {  // Bottom row
+            Coordinate *coord = malloc(sizeof(Coordinate));
+            coord->row = rows - 1;
+            coord->col = j;
+            Stack_push(stack, coord);
             Bit2_put(bit2, rows - 1, j, 0);  // Turn white
-            printf("Turned white at bottom row (%d, %d)\n", rows - 1, j);
         }
     }
 
     // Process the left and right columns
     for (int i = 0; i < rows; i++) {
-        if (Bit2_get(bit2, i, 0) == 1) {  // Left column check
-            add_black_square(i, 0);
+        if (Bit2_get(bit2, i, 0) == 1) {  // Left column
+            Coordinate *coord = malloc(sizeof(Coordinate));
+            coord->row = i;
+            coord->col = 0;
+            Stack_push(stack, coord);
             Bit2_put(bit2, i, 0, 0);  // Turn white
-            printf("Turned white at left column (%d, 0)\n", i);
         }
-        if (Bit2_get(bit2, i, columns - 1) == 1) {  // Right column check
-            add_black_square(i, columns - 1);
+        if (Bit2_get(bit2, i, columns - 1) == 1) {  // Right column
+            Coordinate *coord = malloc(sizeof(Coordinate));
+            coord->row = i;
+            coord->col = columns - 1;
+            Stack_push(stack, coord);
             Bit2_put(bit2, i, columns - 1, 0);  // Turn white
-            printf("Turned white at right column (%d, %d)\n", i, columns - 1);
         }
     }
+
+    // Process all black squares using the stack
+    while (!Stack_empty(stack)) {
+        Coordinate *coord = Stack_pop(stack);
+        // Push adjacent black squares to the stack
+        push_adjacent_black_squares(bit2, stack, coord->row, coord->col);
+        free(coord);  // Free the coordinate after processing
+    }
+
+    Stack_free(&stack);  // Free the stack
 }
 
 // Function to read the PBM file into the Bit2_T structure
@@ -141,13 +145,6 @@ int main(int argc, char *argv[]) {
     FILE *input = fopen(argv[1], "rb");  // Open in binary mode
     assert(input != NULL);
 
-    // Initialize the dynamic black squares array
-    black_squares = malloc(INITIAL_BLACK_SQUARES * sizeof(Coordinate));
-    if (black_squares == NULL) {
-        fprintf(stderr, "Initial allocation of black_squares failed!\n");
-        exit(1);
-    }
-
     char header[3];  // "P4" or other headers
     if (fscanf(input, "%2s", header) != 1 || strcmp(header, "P4") != 0) {
         fprintf(stderr, "Not a valid PBM file (must start with P4).\n");
@@ -165,13 +162,9 @@ int main(int argc, char *argv[]) {
     read_pbm(input, pbm_array);
     process_perimeter(pbm_array);
 
-    // Apply function in row-major order
-    Bit2_map_row_major(pbm_array, apply_row_major, NULL);
-
     print_pbm(pbm_array);
 
     Bit2_free(&pbm_array);  // Free allocated memory
-    free(black_squares);  // Free the dynamically allocated black_squares array
 
     fclose(input);  // Close the file
 
