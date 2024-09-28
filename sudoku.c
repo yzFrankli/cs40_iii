@@ -24,7 +24,7 @@ void fill_array(FILE *input, UArray2_T arr) {
 }
 
 
-int validate_sudoku(UArray2_T arr) {
+int validate_grid(UArray2_T arr) {
     int test_array[9];
 
     for (int i = 0; i < 9; i++) {
@@ -64,12 +64,12 @@ int validate_sudoku(UArray2_T arr) {
 
 
 int validate_section(int arr[]) {
-    int seen[9] = {0};
+    int traversed[9] = {0};
     for (int i = 0; i < 9; i++) {
-        if (arr[i] < 1 || arr[i] > 9 || seen[arr[i] - 1] != 0) {
+        if (arr[i] < 1 || arr[i] > 9 || traversed[arr[i] - 1] != 0) {
             return 0;
         }
-        seen[arr[i] - 1] = 1;
+        traversed[arr[i] - 1] = 1;
     }
     return 1;
 }
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 
     fill_array(sudoku, newArr);
 
-    int is_valid = validate_sudoku(newArr);
+    int is_valid = validate_grid(newArr);
 
     if (is_valid) {
         printf("The Sudoku puzzle is valid!\n");
