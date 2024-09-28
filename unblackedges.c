@@ -12,9 +12,7 @@ typedef struct {
 
 Coordinate black_squares[MAX_BLACK_SQUARES];
 int black_square_count = 0;
-int current_row;
-int current_col;
-Bit2_T pbm_array;  // Use Bit2_T instead of Bit2
+Bit2_T pbm_array;
 
 // Function to check if a black square is adjacent to any squares in the array
 int is_adjacent(Coordinate *black_squares, int count, int row, int col) {
@@ -30,14 +28,11 @@ int is_adjacent(Coordinate *black_squares, int count, int row, int col) {
 }
 
 // Apply function for row-major mapping, checking for adjacent black squares
-void apply_row_major(void *element) {
-    int row = current_row;
-    int col = current_col;
-
-    if (*(int *)element == 1) {  // If this square is black
-        if (is_adjacent(black_squares, black_square_count, row, col)) {
-            black_squares[black_square_count++] = (Coordinate){row, col};
-            Bit2_put(pbm_array, row, col, 0);  // Turn white
+void apply_row_major(int i, int j, Bit2_T bit2, int value, void *cl) {
+    if (value == 1) {  // If this square is black
+        if (is_adjacent(black_squares, black_square_count, i, j)) {
+            black_squares[black_square_count++] = (Coordinate){i, j};
+            Bit2_put(bit2, i, j, 0);  // Turn white
         }
     }
 }
@@ -116,6 +111,7 @@ int main(int argc, char *argv[]) {
     read_pbm(input, pbm_array);
     process_perimeter(pbm_array);
 
+    // Apply function in row-major order
     Bit2_map_row_major(pbm_array, apply_row_major, NULL);
 
     print_pbm(pbm_array);
