@@ -35,7 +35,7 @@ int is_adjacent(Coordinate *black_squares, int count, int row, int col) {
 }
 
 // Apply function for row-major mapping, checking for adjacent black squares
-void apply_row_major(int row, int col, Bit2 *pbm_array, void *element) {
+void apply_row_major(void *element, int row, int col, Bit2 *pbm_array) {
     if (*(int *)element == 1) {  // If this square is black
         if (is_adjacent(black_squares, black_square_count, row, col)) {
             // Add the black square to the array and turn it white
