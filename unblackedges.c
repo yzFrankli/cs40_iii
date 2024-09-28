@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <string.h>
+#include <string.h>  // For strcmp
 #include "bit2.h"
 
 typedef struct {
@@ -9,7 +9,7 @@ typedef struct {
     int col;
 } Coordinate;
 
-#define MAX_BLACK_SQUARES 1000
+#define MAX_BLACK_SQUARES 1000  // Limit the number of black squares to track
 
 Coordinate black_squares[MAX_BLACK_SQUARES];
 int black_square_count = 0;
@@ -30,11 +30,11 @@ int is_adjacent(Coordinate *black_squares, int count, int row, int col) {
 
 // Apply function for row-major mapping, checking for adjacent black squares
 void apply_row_major(int i, int j, Bit2_T bit2, int value, void *cl) {
-    (void)cl;  // Mark the cl parameter as unused to avoid warnings
+    (void)cl;  // Unused parameter
 
     if (value == 1) {  // If this square is black
         if (is_adjacent(black_squares, black_square_count, i, j)) {
-            if (black_square_count < MAX_BLACK_SQUARES) { // Prevent overflow
+            if (black_square_count < MAX_BLACK_SQUARES) {  // Prevent overflow
                 black_squares[black_square_count++] = (Coordinate){i, j};
                 Bit2_put(bit2, i, j, 0);  // Turn white
                 printf("Turned white at (%d, %d)\n", i, j);  // Debugging output
@@ -53,28 +53,46 @@ void process_perimeter(Bit2_T bit2) {
     // Process the top and bottom rows
     for (int j = 0; j < columns; j++) {
         if (Bit2_get(bit2, 0, j) == 1) {  // Top row check
-            black_squares[black_square_count++] = (Coordinate){0, j};
-            Bit2_put(bit2, 0, j, 0);  // Turn white
-            printf("Top row turned white at (0, %d)\n", j);  // Debugging output
+            if (black_square_count < MAX_BLACK_SQUARES) {
+                black_squares[black_square_count++] = (Coordinate){0, j};
+                Bit2_put(bit2, 0, j, 0);  // Turn white
+                printf("Turned white at top row (0, %d)\n", j);
+            } else {
+                printf("Warning: Exceeded MAX_BLACK_SQUARES limit!\n");
+            }
         }
+
         if (Bit2_get(bit2, rows - 1, j) == 1) {  // Bottom row check
-            black_squares[black_square_count++] = (Coordinate){rows - 1, j};
-            Bit2_put(bit2, rows - 1, j, 0);  // Turn white
-            printf("Bottom row turned white at (%d, %d)\n", rows - 1, j);  // Debugging output
+            if (black_square_count < MAX_BLACK_SQUARES) {
+                black_squares[black_square_count++] = (Coordinate){rows - 1, j};
+                Bit2_put(bit2, rows - 1, j, 0);  // Turn white
+                printf("Turned white at bottom row (%d, %d)\n", rows - 1, j);
+            } else {
+                printf("Warning: Exceeded MAX_BLACK_SQUARES limit!\n");
+            }
         }
     }
 
     // Process the left and right columns
     for (int i = 0; i < rows; i++) {
         if (Bit2_get(bit2, i, 0) == 1) {  // Left column check
-            black_squares[black_square_count++] = (Coordinate){i, 0};
-            Bit2_put(bit2, i, 0, 0);  // Turn white
-            printf("Left column turned white at (%d, 0)\n", i);  // Debugging output
+            if (black_square_count < MAX_BLACK_SQUARES) {
+                black_squares[black_square_count++] = (Coordinate){i, 0};
+                Bit2_put(bit2, i, 0, 0);  // Turn white
+                printf("Turned white at left column (%d, 0)\n", i);
+            } else {
+                printf("Warning: Exceeded MAX_BLACK_SQUARES limit!\n");
+            }
         }
+
         if (Bit2_get(bit2, i, columns - 1) == 1) {  // Right column check
-            black_squares[black_square_count++] = (Coordinate){i, columns - 1};
-            Bit2_put(bit2, i, columns - 1, 0);  // Turn white
-            printf("Right column turned white at (%d, %d)\n", i, columns - 1);  // Debugging output
+            if (black_square_count < MAX_BLACK_SQUARES) {
+                black_squares[black_square_count++] = (Coordinate){i, columns - 1};
+                Bit2_put(bit2, i, columns - 1, 0);  // Turn white
+                printf("Turned white at right column (%d, %d)\n", i, columns - 1);
+            } else {
+                printf("Warning: Exceeded MAX_BLACK_SQUARES limit!\n");
+            }
         }
     }
 }
@@ -84,7 +102,7 @@ void read_pbm(FILE *input, Bit2_T bit2) {
     int rows = Bit2_height(bit2);
     int columns = Bit2_width(bit2);
 
-    // Read pixel data for binary PBM (P4)
+    // Read pixel data for binary PBM (P4 format)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j += 8) {
             unsigned char byte;
