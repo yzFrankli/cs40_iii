@@ -75,6 +75,17 @@ void process_perimeter(Bit2 *pbm_array) {
     }
 }
 
+// Function to read the PBM file into the Bit2 structure
+void read_pbm(FILE *input, Bit2 *pbm_array) {
+    for (int i = 0; i < pbm_array->rows; i++) {
+        for (int j = 0; j < pbm_array->columns; j++) {
+            int value;
+            fscanf(input, "%d", &value);
+            Bit_set(pbm_array->Bit_Array, i * pbm_array->columns + j, value);
+        }
+    }
+}
+
 // Function to print the corrected PBM content to stdout
 void print_pbm(Bit2 *pbm_array) {
     int rows = pbm_array->rows;
@@ -92,7 +103,6 @@ void print_pbm(Bit2 *pbm_array) {
     }
 }
 
-// Main function
 int main(int argc, char *argv[]) {
     assert(argc == 2);
 
