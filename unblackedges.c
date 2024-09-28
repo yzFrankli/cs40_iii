@@ -40,7 +40,7 @@ void apply_row_major(int row, int col, Bit2 *pbm_array, void *element) {
         if (is_adjacent(black_squares, black_square_count, row, col)) {
             // Add the black square to the array and turn it white
             black_squares[black_square_count++] = (Coordinate){row, col};
-            *(int *)element = 0;  // Turn white
+            Bit_set(pbm_array->Bit_Array, row * pbm_array->columns + col, 0);  // Turn white using pbm_array
         }
     }
 }
