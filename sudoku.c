@@ -11,7 +11,7 @@
 #include <assert.h>
 #include "uarray2.h"
 
-void fill_array(FILE *input, UArray2 *arr) {
+void fill_array(FILE *input, UArray2_T *arr) {
     int value;
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
@@ -22,7 +22,7 @@ void fill_array(FILE *input, UArray2 *arr) {
     }
 }
 
-int validate_grid(UArray2 *arr) {
+int validate_grid(UArray2_T *arr) {
     int test_array[9];
 
     // Validate rows
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
         sudoku = stdin;
     }
 
-    UArray2 *newArr = create_Uarray2(9, 9, sizeof(int));
+    UArray2_T *newArr = create_Uarray2(9, 9, sizeof(int));
 
     fill_array(sudoku, newArr);
 
