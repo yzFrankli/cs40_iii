@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>  // Include this for strcmp
 #include "bit2.h"
 
 typedef struct {
@@ -74,7 +75,7 @@ void read_pbm(FILE *input, Bit2_T bit2) {
     int rows = Bit2_height(bit2);
     int columns = Bit2_width(bit2);
 
-    // Read the pixel data based on the header type
+    // Read the pixel data for binary PBM
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j += 8) {
             unsigned char byte;
@@ -95,7 +96,7 @@ void print_pbm(Bit2_T bit2) {
     int rows = Bit2_height(bit2);
     int columns = Bit2_width(bit2);
 
-    printf("P1\n");
+    printf("P1\n");  // Change to P1 for output
     printf("%d %d\n", columns, rows);
 
     for (int i = 0; i < rows; i++) {
