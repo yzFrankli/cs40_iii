@@ -4,20 +4,15 @@
  *     9/24/2024
  *     CS40 HW2: iii
  *
- *     
  */
-
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "uarray2.h"
 #include <assert.h>
 
-
-
-
-struct UArray2 *create_Uarray2(int rows, int columns, int element_size) {
-    struct UArray2 *newUArray2 = (struct UArray2 *)malloc(sizeof(struct UArray2));
+UArray2 *create_Uarray2(int rows, int columns, int element_size) {
+    UArray2 *newUArray2 = (UArray2 *)malloc(sizeof(UArray2));
     
     if (newUArray2 == NULL) {
         printf("Memory allocation failed!\n");
@@ -27,13 +22,12 @@ struct UArray2 *create_Uarray2(int rows, int columns, int element_size) {
     newUArray2->rows = rows;
     newUArray2->columns = columns;
     newUArray2->size = element_size;
-    newUArray2->UArray = UArray_new((rows*columns), element_size);
+    newUArray2->UArray = UArray_new((rows * columns), element_size);
 
     return newUArray2;
 }
 
-
-void UArray2_map_col_major(UArray_T *U_Array2, void (*apply)(void *element)) {
+void UArray2_map_col_major(UArray2 *U_Array2, void (*apply)(void *element)) {
     int rows = U_Array2->rows;
     int columns = U_Array2->columns;
 
@@ -46,9 +40,7 @@ void UArray2_map_col_major(UArray_T *U_Array2, void (*apply)(void *element)) {
     }
 }
 
-
-
-void UArray2_map_row_major(UArray_T *U_Array2, void (*apply)(void *element)) {
+void UArray2_map_row_major(UArray2 *U_Array2, void (*apply)(void *element)) {
     int rows = U_Array2->rows;
     int columns = U_Array2->columns;
 
@@ -60,4 +52,3 @@ void UArray2_map_row_major(UArray_T *U_Array2, void (*apply)(void *element)) {
         }
     }
 }
-    
