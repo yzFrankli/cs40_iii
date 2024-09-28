@@ -11,8 +11,9 @@
 #include "uarray2.h"
 #include <assert.h>
 
-UArray2 *create_Uarray2(int rows, int columns, int element_size) {
-    UArray2 *newUArray2 = (UArray2 *)malloc(sizeof(UArray2));
+// Update all references to UArray2 to UArray2_T
+UArray2_T *create_Uarray2(int rows, int columns, int element_size) {
+    UArray2_T *newUArray2 = (UArray2_T *)malloc(sizeof(UArray2_T));
     
     if (newUArray2 == NULL) {
         printf("Memory allocation failed!\n");
@@ -27,7 +28,7 @@ UArray2 *create_Uarray2(int rows, int columns, int element_size) {
     return newUArray2;
 }
 
-void UArray2_map_col_major(UArray2 *U_Array2, void (*apply)(void *element)) {
+void UArray2_map_col_major(UArray2_T *U_Array2, void (*apply)(void *element)) {
     int rows = U_Array2->rows;
     int columns = U_Array2->columns;
 
@@ -40,7 +41,7 @@ void UArray2_map_col_major(UArray2 *U_Array2, void (*apply)(void *element)) {
     }
 }
 
-void UArray2_map_row_major(UArray2 *U_Array2, void (*apply)(void *element)) {
+void UArray2_map_row_major(UArray2_T *U_Array2, void (*apply)(void *element)) {
     int rows = U_Array2->rows;
     int columns = U_Array2->columns;
 
@@ -53,14 +54,11 @@ void UArray2_map_row_major(UArray2 *U_Array2, void (*apply)(void *element)) {
     }
 }
 
-void *UArray2_at(UArray2 *array, int row, int column) {
+void *UArray2_at(UArray2_T *array, int row, int column) {
     assert(array != NULL);
     assert(row >= 0 && row < array->rows);
     assert(column >= 0 && column < array->columns);
     
-    // Convert (row, column) to a 1D index
     int index = row * array->columns + column;
-    
-    // Use Hanson's UArray_at to get the element at that index
     return UArray_at(array->UArray, index);
 }
