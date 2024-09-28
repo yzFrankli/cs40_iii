@@ -92,6 +92,7 @@ void print_pbm(Bit2 *pbm_array) {
     }
 }
 
+// Main function
 int main(int argc, char *argv[]) {
     assert(argc == 2);
 
@@ -101,7 +102,8 @@ int main(int argc, char *argv[]) {
     int rows, columns;
     fscanf(input, "%d %d", &columns, &rows);
 
-    Bit2 *pbm_array = create_Bit2(rows, columns);
+    // Corrected: Pass the size of each element (e.g., sizeof(int)) as the third argument
+    Bit2 *pbm_array = create_Bit2(rows, columns, sizeof(int));
 
     read_pbm(input, pbm_array);
     process_perimeter(pbm_array);
