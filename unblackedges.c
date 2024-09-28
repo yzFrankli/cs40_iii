@@ -76,7 +76,8 @@ void read_pbm(FILE *input, Bit2_T bit2) {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             int value;
-            if (fscanf(input, "%d", &value) == 1) {  // Ensure valid input
+            // Ensure valid input
+            if (fscanf(input, "%d", &value) == 1) {
                 Bit2_put(bit2, i, j, value);
             } else {
                 fprintf(stderr, "Error reading PBM file at (%d, %d)\n", i, j);
@@ -110,7 +111,11 @@ int main(int argc, char *argv[]) {
     assert(input != NULL);
 
     int rows, columns;
-    fscanf(input, "%d %d", &columns, &rows);
+    // Ensure valid dimensions are read
+    if (fscanf(input, "%d %d", &columns, &rows) != 2 || rows <= 0 || columns <= 0) {
+        fprintf(stderr, "Error reading dimensions from PBM file.\n");
+        exit(1);
+    }
 
     pbm_array = Bit2_new(rows, columns);  // Create the Bit2_T array
 
@@ -122,9 +127,9 @@ int main(int argc, char *argv[]) {
 
     print_pbm(pbm_array);
 
-    Bit2_free(&pbm_array);
+    Bit2_free(&pbm_array);  // Free allocated memory
 
-    fclose(input);
+    fclose(input);  // Close the file
 
     return 0;
 }
