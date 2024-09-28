@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <string.h>  // Include this for strcmp
+#include <string.h>  // Required for strcmp
 #include "bit2.h"
 
 typedef struct {
@@ -34,8 +34,10 @@ void apply_row_major(int i, int j, Bit2_T bit2, int value, void *cl) {
 
     if (value == 1) {  // If this square is black
         if (is_adjacent(black_squares, black_square_count, i, j)) {
-            black_squares[black_square_count++] = (Coordinate){i, j};
-            Bit2_put(bit2, i, j, 0);  // Turn white
+            if (black_square_count < MAX_BLACK_SQUARES) { // Prevent overflow
+                black_squares[black_square_count++] = (Coordinate){i, j};
+                Bit2_put(bit2, i, j, 0);  // Turn white
+            }
         }
     }
 }
@@ -48,24 +50,32 @@ void process_perimeter(Bit2_T bit2) {
     // Process the top and bottom rows
     for (int j = 0; j < columns; j++) {
         if (Bit2_get(bit2, 0, j) == 1) {
-            black_squares[black_square_count++] = (Coordinate){0, j};
-            Bit2_put(bit2, 0, j, 0);  // Turn white
+            if (black_square_count < MAX_BLACK_SQUARES) { // Prevent overflow
+                black_squares[black_square_count++] = (Coordinate){0, j};
+                Bit2_put(bit2, 0, j, 0);  // Turn white
+            }
         }
         if (Bit2_get(bit2, rows - 1, j) == 1) {
-            black_squares[black_square_count++] = (Coordinate){rows - 1, j};
-            Bit2_put(bit2, rows - 1, j, 0);  // Turn white
+            if (black_square_count < MAX_BLACK_SQUARES) { // Prevent overflow
+                black_squares[black_square_count++] = (Coordinate){rows - 1, j};
+                Bit2_put(bit2, rows - 1, j, 0);  // Turn white
+            }
         }
     }
 
     // Process the left and right columns
     for (int i = 0; i < rows; i++) {
         if (Bit2_get(bit2, i, 0) == 1) {
-            black_squares[black_square_count++] = (Coordinate){i, 0};
-            Bit2_put(bit2, i, 0, 0);  // Turn white
+            if (black_square_count < MAX_BLACK_SQUARES) { // Prevent overflow
+                black_squares[black_square_count++] = (Coordinate){i, 0};
+                Bit2_put(bit2, i, 0, 0);  // Turn white
+            }
         }
         if (Bit2_get(bit2, i, columns - 1) == 1) {
-            black_squares[black_square_count++] = (Coordinate){i, columns - 1};
-            Bit2_put(bit2, i, columns - 1, 0);  // Turn white
+            if (black_square_count < MAX_BLACK_SQUARES) { // Prevent overflow
+                black_squares[black_square_count++] = (Coordinate){i, columns - 1};
+                Bit2_put(bit2, i, columns - 1, 0);  // Turn white
+            }
         }
     }
 }
@@ -75,7 +85,7 @@ void read_pbm(FILE *input, Bit2_T bit2) {
     int rows = Bit2_height(bit2);
     int columns = Bit2_width(bit2);
 
-    // Read the pixel data for binary PBM
+    // Read pixel data for binary PBM (P4)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j += 8) {
             unsigned char byte;
