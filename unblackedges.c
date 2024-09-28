@@ -121,4 +121,23 @@ int main(int argc, char *argv[]) {
 
     int rows, columns;
     if (fscanf(input, "%d %d", &columns, &rows) != 2 || rows <= 0 || columns <= 0) {
-       
+        fprintf(stderr, "Error reading dimensions from PBM file.\n");
+        exit(1);
+    }
+
+    pbm_array = Bit2_new(columns, rows);  // Create the Bit2_T array
+
+    read_pbm(input, pbm_array);
+    process_perimeter(pbm_array);
+
+    // Apply function in row-major order
+    Bit2_map_row_major(pbm_array, apply_row_major, NULL);
+
+    print_pbm(pbm_array);
+
+    Bit2_free(&pbm_array);  // Free allocated memory
+
+    fclose(input);  // Close the file
+
+    return 0;
+}
