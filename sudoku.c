@@ -4,7 +4,6 @@
  *     9/24/2024
  *     CS40 HW2: iii
  *
- *     
  */
 
 #include <stdio.h>
@@ -26,6 +25,7 @@ void fill_array(FILE *input, UArray2 *arr) {
 int validate_grid(UArray2 *arr) {
     int test_array[9];
 
+    // Validate rows
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
             test_array[j] = *(int *)UArray2_at(arr, i, j);
@@ -35,6 +35,7 @@ int validate_grid(UArray2 *arr) {
         }
     }
 
+    // Validate columns
     for (int j = 0; j < 9; j++) {
         for (int i = 0; i < 9; i++) {
             test_array[i] = *(int *)UArray2_at(arr, i, j);
@@ -44,6 +45,7 @@ int validate_grid(UArray2 *arr) {
         }
     }
 
+    // Validate 3x3 sub-grids
     for (int grid_row = 0; grid_row < 3; grid_row++) {
         for (int grid_col = 0; grid_col < 3; grid_col++) {
             int index = 0;
@@ -95,8 +97,10 @@ int main(int argc, char *argv[]) {
         printf("The Sudoku puzzle is invalid!\n");
     }
 
+    // Free memory
     free(newArr->UArray);
     free(newArr);
+    
     if (argc == 2) {
         fclose(sudoku);
     }
