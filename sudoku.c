@@ -1,5 +1,5 @@
 /*
- *     sudoku.h
+ *     sudoku.c
  *     By Sid & Frank
  *     9/24/2024
  *     CS40 HW2: iii
@@ -12,19 +12,18 @@
 #include <assert.h>
 #include "uarray2.h"
 
-void fill_array(FILE *input, UArray2_T arr) {
+void fill_array(FILE *input, UArray2 *arr) {
     int value;
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
             fscanf(input, "%d", &value);
-            int *element = UArray2_at(arr, i, j);
+            int *element = (int *)UArray2_at(arr, i, j);
             *element = value;
         }
     }
 }
 
-
-int validate_grid(UArray2_T arr) {
+int validate_grid(UArray2 *arr) {
     int test_array[9];
 
     for (int i = 0; i < 9; i++) {
@@ -62,7 +61,6 @@ int validate_grid(UArray2_T arr) {
     return 1;
 }
 
-
 int validate_section(int arr[]) {
     int traversed[9] = {0};
     for (int i = 0; i < 9; i++) {
@@ -73,7 +71,6 @@ int validate_section(int arr[]) {
     }
     return 1;
 }
-
 
 int main(int argc, char *argv[]) {
     assert(argc < 3);
@@ -86,7 +83,7 @@ int main(int argc, char *argv[]) {
         sudoku = stdin;
     }
 
-    UArray2_T newArr = UArray2_new(9, 9, sizeof(int));
+    UArray2 *newArr = create_Uarray2(9, 9, sizeof(int));
 
     fill_array(sudoku, newArr);
 
@@ -98,7 +95,8 @@ int main(int argc, char *argv[]) {
         printf("The Sudoku puzzle is invalid!\n");
     }
 
-    UArray2_free(&newArr);
+    free(newArr->UArray);
+    free(newArr);
     if (argc == 2) {
         fclose(sudoku);
     }
