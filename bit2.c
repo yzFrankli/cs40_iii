@@ -7,62 +7,46 @@
  *     Purpose: Defines the Bit2 structure and its associated operations
  */
 
+#include "bit2.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <bit2.h>
-#include <bit.h>
-#include <uarray.h>
 #include <assert.h>
+#include <uarray.h>
 
-// Define the Bit2 structure
-struct Bit2 {
-    int rows;
-    int columns;
-    int size;
-    UArray_T Bit_Array;  // Assuming Bit_Array is a UArray_T storing bits
-};
+// Implement the functions but don't redefine the struct here
 
-// Function to create a new Bit2 structure
-struct Bit2 *create_Bit2(int rows, int columns, int element_size) {
-    struct Bit2 *newBit2 = (struct Bit2 *)malloc(sizeof(struct Bit2));
-    
-    if (newBit2 == NULL) {
-        printf("Memory allocation failed!\n");
-        return NULL;
-    }
+// Function to create a new Bit2 2D array
+Bit2 *create_Bit2(int rows, int columns, int element_size) {
+    Bit2 *newBit2 = malloc(sizeof(Bit2));
+    assert(newBit2 != NULL);
 
     newBit2->rows = rows;
     newBit2->columns = columns;
-    newBit2->size = element_size;
-    newBit2->Bit_Array = UArray_new((rows * columns), element_size);  // Allocate bit array using UArray
+    newBit2->Bit_Array = UArray_new(rows * columns, element_size);
 
     return newBit2;
 }
 
-// Function to map over the Bit2 structure in column-major order
-void Bit2_map_col_major(Bit2 *Bit_2, void (*apply)(void *element)) {
-    int rows = Bit_2->rows;
-    int columns = Bit_2->columns;
-
-    for (int i = 0; i < columns; i++) {
-        for (int j = 0; j < rows; j++) {
-            int index = j * columns + i;
-            void *element = UArray_at(Bit_2->Bit_Array, index);
+// Function to map over the array in row-major order
+void Bit2_map_row_major(Bit2 *bit2, void (*apply)(void *element)) {
+    for (int i = 0; i < bit2->rows; i++) {
+        for (int j = 0; j < bit2->columns; j++) {
+            int index = i * bit2->columns + j;
+            void *element = UArray_at(bit2->Bit_Array, index);
             apply(element);
         }
     }
 }
 
-// Function to map over the Bit2 structure in row-major order
-void Bit2_map_row_major(Bit2 *Bit_2, void (*apply)(void *element)) {
-    int rows = Bit_2->rows;
-    int columns = Bit_2->columns;
-
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < columns; j++) {
-            int index = i * columns + j;
-            void *element = UArray_at(Bit_2->Bit_Array, index);
-            apply(element);
-        }
-    }
+// Function to set a bit in the array
+void Bit_set(UArray_T array, int index, int value) {
+    int *element = UArray_at(array, index);
+    *element = value;
 }
+
+// Function to get a bit from the array
+int Bit_get(UArray_T array, int index) {
+    int *element = UArray_at(array, index);
+    return *element;
+}
+
