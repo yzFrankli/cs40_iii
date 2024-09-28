@@ -73,15 +73,18 @@ void process_perimeter(Bit2_T bit2) {
 void read_pbm(FILE *input, Bit2_T bit2) {
     int rows = Bit2_height(bit2);
     int columns = Bit2_width(bit2);
+
+    // Read the pixel data based on the header type
     for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < columns; j++) {
-            int value;
-            // Ensure valid input
-            if (fscanf(input, "%d", &value) == 1) {
-                Bit2_put(bit2, i, j, value);
-            } else {
-                fprintf(stderr, "Error reading PBM file at (%d, %d)\n", i, j);
+        for (int j = 0; j < columns; j += 8) {
+            unsigned char byte;
+            if (fread(&byte, sizeof(unsigned char), 1, input) != 1) {
+                fprintf(stderr, "Error reading PBM file at byte (%d, %d)\n", i, j);
                 exit(1);
+            }
+            // Set bits for this byte into the Bit2 array
+            for (int bit = 0; bit < 8 && j + bit < columns; bit++) {
+                Bit2_put(bit2, i, j + bit, (byte & (1 << (7 - bit))) ? 1 : 0);
             }
         }
     }
@@ -107,29 +110,15 @@ void print_pbm(Bit2_T bit2) {
 int main(int argc, char *argv[]) {
     assert(argc == 2);
 
-    FILE *input = fopen(argv[1], "r");
+    FILE *input = fopen(argv[1], "rb");  // Open in binary mode
     assert(input != NULL);
 
-    int rows, columns;
-    // Ensure valid dimensions are read
-    if (fscanf(input, "%d %d", &columns, &rows) != 2 || rows <= 0 || columns <= 0) {
-        fprintf(stderr, "Error reading dimensions from PBM file.\n");
+    char header[3];  // "P4" or other headers
+    if (fscanf(input, "%2s", header) != 1 || strcmp(header, "P4") != 0) {
+        fprintf(stderr, "Not a valid PBM file (must start with P4).\n");
         exit(1);
     }
 
-    pbm_array = Bit2_new(rows, columns);  // Create the Bit2_T array
-
-    read_pbm(input, pbm_array);
-    process_perimeter(pbm_array);
-
-    // Apply function in row-major order
-    Bit2_map_row_major(pbm_array, apply_row_major, NULL);
-
-    print_pbm(pbm_array);
-
-    Bit2_free(&pbm_array);  // Free allocated memory
-
-    fclose(input);  // Close the file
-
-    return 0;
-}
+    int rows, columns;
+    if (fscanf(input, "%d %d", &columns, &rows) != 2 || rows <= 0 || columns <= 0) {
+       
