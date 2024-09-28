@@ -76,8 +76,12 @@ void read_pbm(FILE *input, Bit2_T bit2) {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             int value;
-            fscanf(input, "%d", &value);
-            Bit2_put(bit2, i, j, value);
+            if (fscanf(input, "%d", &value) == 1) {  // Ensure valid input
+                Bit2_put(bit2, i, j, value);
+            } else {
+                fprintf(stderr, "Error reading PBM file at (%d, %d)\n", i, j);
+                exit(1);
+            }
         }
     }
 }
