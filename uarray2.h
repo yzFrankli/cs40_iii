@@ -23,5 +23,5 @@ typedef struct UArray2 {
 UArray2 *create_Uarray2(int rows, int columns, int element_size);
 void UArray2_map_col_major(UArray2 *U_Array2, void (*apply)(void *element));  // Changed to use UArray2 alias
 void UArray2_map_row_major(UArray2 *U_Array2, void (*apply)(void *element));  // Changed to use UArray2 alias
-
+void *UArray2_at(UArray2 *array, int row, int column);
 #endif /* _UARRAY2_T_ */
