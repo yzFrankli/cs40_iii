@@ -11,90 +11,92 @@
 #include <assert.h>
 #include "bit2.h"
 
+typedef struct {
+    int row;
+    int col;
+} Coordinate;
 
-void read_pbm(FILE *input, Bit2 *pbm_array) {
-    for (int i = 0; i < pbm_array->rows; i++) {
-        for (int j = 0; j < pbm_array->columns; j++) {
-            int value;
-            fscanf(input, "%d", &value);
-            if (value == 1) {  // Replacing BLACK with 1
-                Bit_set(pbm_array->Bit_Array, i * pbm_array->columns + j, 1);
-            }
+#define MAX_BLACK_SQUARES 1000  // Adjust this as necessary
+
+Coordinate black_squares[MAX_BLACK_SQUARES];
+int black_square_count = 0;
+
+// Function to check if a black square is adjacent to any squares in the array
+int is_adjacent(Coordinate *black_squares, int count, int row, int col) {
+    for (int i = 0; i < count; i++) {
+        int r = black_squares[i].row;
+        int c = black_squares[i].col;
+
+        if ((abs(r - row) <= 1) && (abs(c - col) <= 1)) {
+            return 1;  // Found an adjacent black square
+        }
+    }
+    return 0;
+}
+
+// Apply function for row-major mapping, checking for adjacent black squares
+void apply_row_major(int row, int col, Bit2 *pbm_array, void *element) {
+    if (*(int *)element == 1) {  // If this square is black
+        if (is_adjacent(black_squares, black_square_count, row, col)) {
+            // Add the black square to the array and turn it white
+            black_squares[black_square_count++] = (Coordinate){row, col};
+            *(int *)element = 0;  // Turn white
         }
     }
 }
 
-
-void process_edges(Bit2 *pbm_array) {
+// Function to process the perimeter of the PBM array
+void process_perimeter(Bit2 *pbm_array) {
     int rows = pbm_array->rows;
     int columns = pbm_array->columns;
 
+    // 1. Process the top and bottom rows
     for (int j = 0; j < columns; j++) {
         if (Bit_get(pbm_array->Bit_Array, 0 * columns + j) == 1) {
-            flood_fill(pbm_array, 0, j);
+            black_squares[black_square_count++] = (Coordinate){0, j};
+            Bit_set(pbm_array->Bit_Array, 0 * columns + j, 0);  // Turn white
         }
         if (Bit_get(pbm_array->Bit_Array, (rows - 1) * columns + j) == 1) {
-            flood_fill(pbm_array, rows - 1, j);
+            black_squares[black_square_count++] = (Coordinate){rows - 1, j};
+            Bit_set(pbm_array->Bit_Array, (rows - 1) * columns + j, 0);  // Turn white
         }
     }
 
+    // 2. Process the left and right columns
     for (int i = 0; i < rows; i++) {
         if (Bit_get(pbm_array->Bit_Array, i * columns + 0) == 1) {
-            flood_fill(pbm_array, i, 0);
+            black_squares[black_square_count++] = (Coordinate){i, 0};
+            Bit_set(pbm_array->Bit_Array, i * columns + 0, 0);  // Turn white
         }
         if (Bit_get(pbm_array->Bit_Array, i * columns + (columns - 1)) == 1) {
-            flood_fill(pbm_array, i, columns - 1);
+            black_squares[black_square_count++] = (Coordinate){i, columns - 1};
+            Bit_set(pbm_array->Bit_Array, i * columns + (columns - 1), 0);  // Turn white
         }
     }
 }
 
-void flood_fill(Bit2 *pbm_array, int row, int col) {
+// Function to print the corrected PBM content to stdout
+void print_pbm(Bit2 *pbm_array) {
     int rows = pbm_array->rows;
     int columns = pbm_array->columns;
 
-    if (row < 0 || row >= rows || col < 0 || col >= columns || 
-        Bit_get(pbm_array->Bit_Array, row * columns + col) == 0) {  // Replacing WHITE with 0
-        return;
-    }
-
-    Bit_set(pbm_array->Bit_Array, row * columns + col, 0);  // Set to 0 (WHITE)
-
-    // Recursive flood-fill for all directions
-    flood_fill(pbm_array, row - 1, col);   // Up
-    flood_fill(pbm_array, row + 1, col);   // Down
-    flood_fill(pbm_array, row, col - 1);   // Left
-    flood_fill(pbm_array, row, col + 1);   // Right
-    flood_fill(pbm_array, row - 1, col - 1); // Diagonal up-left
-    flood_fill(pbm_array, row - 1, col + 1); // Diagonal up-right
-    flood_fill(pbm_array, row + 1, col - 1); // Diagonal down-left
-    flood_fill(pbm_array, row + 1, col + 1); // Diagonal down-right
-}
-
-
-void write_pbm(FILE *output, Bit2 *pbm_array) {
-    int rows = pbm_array->rows;
-    int columns = pbm_array->columns;
-
-    fprintf(output, "P1\n");
-    fprintf(output, "%d %d\n", columns, rows);
+    printf("P1\n");
+    printf("%d %d\n", columns, rows);
 
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             int value = Bit_get(pbm_array->Bit_Array, i * columns + j);
-            fprintf(output, "%d ", value);
+            printf("%d ", value);
         }
-        fprintf(output, "\n");
+        printf("\n");
     }
 }
 
-
 int main(int argc, char *argv[]) {
-    assert(argc == 3);
+    assert(argc == 2);
 
     FILE *input = fopen(argv[1], "r");
-    FILE *output = fopen(argv[2], "w");
     assert(input != NULL);
-    assert(output != NULL);
 
     int rows, columns;
     fscanf(input, "%d %d", &columns, &rows);
@@ -102,13 +104,16 @@ int main(int argc, char *argv[]) {
     Bit2 *pbm_array = create_Bit2(rows, columns);
 
     read_pbm(input, pbm_array);
-    process_edges(pbm_array);
-    write_pbm(output, pbm_array);
+    process_perimeter(pbm_array);
+
+    // Map through the interior of the array row by row using your Bit2_map_row_major
+    Bit2_map_row_major(pbm_array, apply_row_major);
+
+    print_pbm(pbm_array);
 
     free(pbm_array); 
 
     fclose(input);
-    fclose(output);
 
     return 0;
 }
