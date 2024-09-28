@@ -37,6 +37,7 @@ void apply_row_major(int i, int j, Bit2_T bit2, int value, void *cl) {
             if (black_square_count < MAX_BLACK_SQUARES) { // Prevent overflow
                 black_squares[black_square_count++] = (Coordinate){i, j};
                 Bit2_put(bit2, i, j, 0);  // Turn white
+                printf("Turned white at (%d, %d)\n", i, j);  // Debugging output
             }
         }
     }
@@ -47,18 +48,22 @@ void process_perimeter(Bit2_T bit2) {
     int rows = Bit2_height(bit2);
     int columns = Bit2_width(bit2);
 
+    printf("Processing perimeter: rows=%d, columns=%d\n", rows, columns);  // Debugging output
+
     // Process the top and bottom rows
     for (int j = 0; j < columns; j++) {
         if (Bit2_get(bit2, 0, j) == 1) {
             if (black_square_count < MAX_BLACK_SQUARES) { // Prevent overflow
                 black_squares[black_square_count++] = (Coordinate){0, j};
                 Bit2_put(bit2, 0, j, 0);  // Turn white
+                printf("Top row turned white at (0, %d)\n", j);  // Debugging output
             }
         }
         if (Bit2_get(bit2, rows - 1, j) == 1) {
             if (black_square_count < MAX_BLACK_SQUARES) { // Prevent overflow
                 black_squares[black_square_count++] = (Coordinate){rows - 1, j};
                 Bit2_put(bit2, rows - 1, j, 0);  // Turn white
+                printf("Bottom row turned white at (%d, %d)\n", rows - 1, j);  // Debugging output
             }
         }
     }
@@ -69,12 +74,14 @@ void process_perimeter(Bit2_T bit2) {
             if (black_square_count < MAX_BLACK_SQUARES) { // Prevent overflow
                 black_squares[black_square_count++] = (Coordinate){i, 0};
                 Bit2_put(bit2, i, 0, 0);  // Turn white
+                printf("Left column turned white at (%d, 0)\n", i);  // Debugging output
             }
         }
         if (Bit2_get(bit2, i, columns - 1) == 1) {
             if (black_square_count < MAX_BLACK_SQUARES) { // Prevent overflow
                 black_squares[black_square_count++] = (Coordinate){i, columns - 1};
                 Bit2_put(bit2, i, columns - 1, 0);  // Turn white
+                printf("Right column turned white at (%d, %d)\n", i, columns - 1);  // Debugging output
             }
         }
     }
