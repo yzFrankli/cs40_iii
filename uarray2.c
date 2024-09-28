@@ -52,3 +52,15 @@ void UArray2_map_row_major(UArray2 *U_Array2, void (*apply)(void *element)) {
         }
     }
 }
+
+void *UArray2_at(UArray2 *array, int row, int column) {
+    assert(array != NULL);
+    assert(row >= 0 && row < array->rows);
+    assert(column >= 0 && column < array->columns);
+    
+    // Convert (row, column) to a 1D index
+    int index = row * array->columns + column;
+    
+    // Use Hanson's UArray_at to get the element at that index
+    return UArray_at(array->UArray, index);
+}
