@@ -6,23 +6,22 @@
  *
  */
 
-#ifndef _UARRAY2_T_
-#define _UARRAY2_T_
+#ifndef UARRAY2_H
+#define UARRAY2_H
 
 #include <uarray.h>
 
-// Change the struct name to UArray2_T
-typedef struct UArray2_T {
-    int rows;
-    int columns;
-    int size;
-    UArray_T UArray;
-} UArray2_T;  // Alias 'UArray2_T' for 'struct UArray2_T'
+typedef struct UArray2_T *UArray2_T;  // Define UArray2_T type
 
-// Function declarations
-UArray2_T *create_Uarray2(int rows, int columns, int element_size);
-void UArray2_map_col_major(UArray2_T *U_Array2, void (*apply)(void *element));
-void UArray2_map_row_major(UArray2_T *U_Array2, void (*apply)(void *element));
-void *UArray2_at(UArray2_T *array, int row, int column);
+// Function declarations for the UArray2 interface
+UArray2_T UArray2_new(int width, int height, int element_size);
+void UArray2_free(UArray2_T *uarray2);
+void *UArray2_at(UArray2_T uarray2, int i, int j);
+int UArray2_width(UArray2_T uarray2);
+int UArray2_height(UArray2_T uarray2);
+int UArray2_size(UArray2_T uarray2);
+void UArray2_map_row_major(UArray2_T uarray2, void (*apply)(int i, int j, UArray2_T uarray2, void *p1, void *p2), void *cl);
+void UArray2_map_col_major(UArray2_T uarray2, void (*apply)(int i, int j, UArray2_T uarray2, void *p1, void *p2), void *cl);
 
-#endif /* _UARRAY2_T_ */
+#endif /* UARRAY2_H */
+
