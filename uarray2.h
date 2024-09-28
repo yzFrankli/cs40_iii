@@ -11,17 +11,18 @@
 
 #include <uarray.h>
 
-// Use typedef to avoid having to use 'struct' every time
-typedef struct UArray2 {
+// Change the struct name to UArray2_T
+typedef struct UArray2_T {
     int rows;
     int columns;
     int size;
     UArray_T UArray;
-} UArray2;  // This creates an alias 'UArray2' for 'struct UArray2'
+} UArray2_T;  // Alias 'UArray2_T' for 'struct UArray2_T'
 
 // Function declarations
-UArray2 *create_Uarray2(int rows, int columns, int element_size);
-void UArray2_map_col_major(UArray2 *U_Array2, void (*apply)(void *element));  // Changed to use UArray2 alias
-void UArray2_map_row_major(UArray2 *U_Array2, void (*apply)(void *element));  // Changed to use UArray2 alias
-void *UArray2_at(UArray2 *array, int row, int column);
+UArray2_T *create_Uarray2(int rows, int columns, int element_size);
+void UArray2_map_col_major(UArray2_T *U_Array2, void (*apply)(void *element));
+void UArray2_map_row_major(UArray2_T *U_Array2, void (*apply)(void *element));
+void *UArray2_at(UArray2_T *array, int row, int column);
+
 #endif /* _UARRAY2_T_ */
