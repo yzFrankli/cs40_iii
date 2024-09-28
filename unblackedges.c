@@ -35,7 +35,9 @@ int is_adjacent(Coordinate *black_squares, int count, int row, int col) {
 }
 
 // Apply function for row-major mapping, checking for adjacent black squares
-void apply_row_major(void *element, int row, int col, Bit2 *pbm_array) {
+void apply_row_major(void *element, void *pbm_array_cl, int row, int col) {
+    Bit2 *pbm_array = (Bit2 *)pbm_array_cl;  // Cast closure to the correct type
+
     if (*(int *)element == 1) {  // If this square is black
         if (is_adjacent(black_squares, black_square_count, row, col)) {
             // Add the black square to the array and turn it white
@@ -119,7 +121,7 @@ int main(int argc, char *argv[]) {
     process_perimeter(pbm_array);
 
     // Map through the interior of the array row by row using your Bit2_map_row_major
-    Bit2_map_row_major(pbm_array, apply_row_major);
+    Bit2_map_row_major(pbm_array, apply_row_major, pbm_array);
 
     print_pbm(pbm_array);
 
