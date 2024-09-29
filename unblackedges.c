@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include "bit2.h"
-#include "stack.h"  // Include Hanson's stack
+#include "stack.h"
 
 typedef struct {
     int row;
@@ -12,81 +12,77 @@ typedef struct {
 
 Bit2_T pbm_array;
 
-// Function to add adjacent black squares to the stack
-void push_adjacent_black_squares(Bit2_T bit2, Stack_T stack, int row, int col) {
+void push_adjacent(Bit2_T bit2, Stack_T stack, int row, int col) {
     int rows = Bit2_height(bit2);
     int columns = Bit2_width(bit2);
 
-    // Check each adjacent square (up, down, left, right) and push onto the stack if it's black
-    if (row > 0 && Bit2_get(bit2, row - 1, col) == 1) {  // Up
+    if (row > 0 && Bit2_get(bit2, row - 1, col) == 1) {
         Coordinate *coord = malloc(sizeof(Coordinate));
         coord->row = row - 1;
         coord->col = col;
         Stack_push(stack, coord);
-        Bit2_put(bit2, row - 1, col, 0);  // Turn white
+        Bit2_put(bit2, row - 1, col, 0);
     }
-    if (row < rows - 1 && Bit2_get(bit2, row + 1, col) == 1) {  // Down
+    if (row < rows - 1 && Bit2_get(bit2, row + 1, col) == 1) { 
         Coordinate *coord = malloc(sizeof(Coordinate));
         coord->row = row + 1;
         coord->col = col;
         Stack_push(stack, coord);
-        Bit2_put(bit2, row + 1, col, 0);  // Turn white
+        Bit2_put(bit2, row + 1, col, 0);
     }
-    if (col > 0 && Bit2_get(bit2, row, col - 1) == 1) {  // Left
+    if (col > 0 && Bit2_get(bit2, row, col - 1) == 1) {
         Coordinate *coord = malloc(sizeof(Coordinate));
         coord->row = row;
         coord->col = col - 1;
         Stack_push(stack, coord);
-        Bit2_put(bit2, row, col - 1, 0);  // Turn white
+        Bit2_put(bit2, row, col - 1, 0);
     }
-    if (col < columns - 1 && Bit2_get(bit2, row, col + 1) == 1) {  // Right
+    if (col < columns - 1 && Bit2_get(bit2, row, col + 1) == 1) {
         Coordinate *coord = malloc(sizeof(Coordinate));
         coord->row = row;
         coord->col = col + 1;
         Stack_push(stack, coord);
-        Bit2_put(bit2, row, col + 1, 0);  // Turn white
+        Bit2_put(bit2, row, col + 1, 0);
     }
 }
 
-// Function to process the perimeter of the PBM array and push black squares onto the stack
 void process_perimeter(Bit2_T bit2) {
     int rows = Bit2_height(bit2);
     int columns = Bit2_width(bit2);
-    Stack_T stack = Stack_new();  // Create Hanson's stack
+    Stack_T stack = Stack_new(); 
 
-    // Process the top and bottom rows
     for (int j = 0; j < columns; j++) {
-        if (Bit2_get(bit2, 0, j) == 1) {  // Top row
+        if (Bit2_get(bit2, 0, j) == 1) {
             Coordinate *coord = malloc(sizeof(Coordinate));
             coord->row = 0;
             coord->col = j;
             Stack_push(stack, coord);
-            Bit2_put(bit2, 0, j, 0);  // Turn white
+            Bit2_put(bit2, 0, j, 0);
         }
-        if (Bit2_get(bit2, rows - 1, j) == 1) {  // Bottom row
+        if (Bit2_get(bit2, rows - 1, j) == 1) {
             Coordinate *coord = malloc(sizeof(Coordinate));
             coord->row = rows - 1;
             coord->col = j;
             Stack_push(stack, coord);
-            Bit2_put(bit2, rows - 1, j, 0);  // Turn white
+            Bit2_put(bit2, rows - 1, j, 0);
         }
     }
 
-    // Process the left and right columns
+    
     for (int i = 0; i < rows; i++) {
-        if (Bit2_get(bit2, i, 0) == 1) {  // Left column
+        if (Bit2_get(bit2, i, 0) == 1) {
             Coordinate *coord = malloc(sizeof(Coordinate));
             coord->row = i;
             coord->col = 0;
             Stack_push(stack, coord);
-            Bit2_put(bit2, i, 0, 0);  // Turn white
+            Bit2_put(bit2, i, 0, 0);
         }
-        if (Bit2_get(bit2, i, columns - 1) == 1) {  // Right column
+        if (Bit2_get(bit2, i, columns - 1) == 1) {
             Coordinate *coord = malloc(sizeof(Coordinate));
             coord->row = i;
             coord->col = columns - 1;
             Stack_push(stack, coord);
-            Bit2_put(bit2, i, columns - 1, 0);  // Turn white
+            Bit2_put(bit2, i, columns - 1, 0);
         }
     }
 
@@ -94,7 +90,7 @@ void process_perimeter(Bit2_T bit2) {
     while (!Stack_empty(stack)) {
         Coordinate *coord = Stack_pop(stack);
         // Push adjacent black squares to the stack
-        push_adjacent_black_squares(bit2, stack, coord->row, coord->col);
+        push_adjacent(bit2, stack, coord->row, coord->col);
         free(coord);  // Free the coordinate after processing
     }
 
