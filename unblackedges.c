@@ -132,10 +132,10 @@ void print_pbm(Bit2_T bit2) {
 int main(int argc, char *argv[]) {
     assert(argc == 2);
 
-    FILE *input = fopen(argv[1], "rb");  // Open in binary mode
+    FILE *input = fopen(argv[1], "rb");
     assert(input != NULL);
 
-    char header[3];  // "P4" or other headers
+    char header[3];
     if (fscanf(input, "%2s", header) != 1 || strcmp(header, "P4") != 0) {
         fprintf(stderr, "Not a valid PBM file (must start with P4).\n");
         exit(1);
@@ -147,16 +147,16 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    pbm_array = Bit2_new(columns, rows);  // Create the Bit2_T array
+    pbm_array = Bit2_new(columns, rows);
 
     read_pbm(input, pbm_array);
     process_perimeter(pbm_array);
 
     print_pbm(pbm_array);
 
-    Bit2_free(&pbm_array);  // Free allocated memory
+    Bit2_free(&pbm_array);
 
-    fclose(input);  // Close the file
+    fclose(input);
 
     return 0;
 }
