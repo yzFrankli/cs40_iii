@@ -103,7 +103,7 @@ void read_pbm(FILE *input, Bit2_T bit2) {
         for (int j = 0; j < columns; j += 8) {
             unsigned char byte;
             if (fread(&byte, sizeof(unsigned char), 1, input) != 1) {
-                fprintf(stderr, "Error reading PBM file at byte (%d, %d)\n", i, j);
+                // fprintf(stderr, "Error reading PBM file at byte (%d, %d)\n", i, j);
                 exit(1);
             }
             for (int bit = 0; bit < 8 && j + bit < columns; bit++) {
