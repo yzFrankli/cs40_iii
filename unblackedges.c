@@ -86,23 +86,19 @@ void process_perimeter(Bit2_T bit2) {
         }
     }
 
-    // Process all black squares using the stack
     while (!Stack_empty(stack)) {
         Coordinate *coord = Stack_pop(stack);
-        // Push adjacent black squares to the stack
         push_adjacent(bit2, stack, coord->row, coord->col);
-        free(coord);  // Free the coordinate after processing
+        free(coord);
     }
 
-    Stack_free(&stack);  // Free the stack
+    Stack_free(&stack);
 }
 
-// Function to read the PBM file into the Bit2_T structure
 void read_pbm(FILE *input, Bit2_T bit2) {
     int rows = Bit2_height(bit2);
     int columns = Bit2_width(bit2);
 
-    // Read pixel data for binary PBM (P4 format)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j += 8) {
             unsigned char byte;
@@ -110,7 +106,6 @@ void read_pbm(FILE *input, Bit2_T bit2) {
                 fprintf(stderr, "Error reading PBM file at byte (%d, %d)\n", i, j);
                 exit(1);
             }
-            // Set bits for this byte into the Bit2 array
             for (int bit = 0; bit < 8 && j + bit < columns; bit++) {
                 Bit2_put(bit2, i, j + bit, (byte & (1 << (7 - bit))) ? 1 : 0);
             }
@@ -118,12 +113,11 @@ void read_pbm(FILE *input, Bit2_T bit2) {
     }
 }
 
-// Function to print the corrected PBM content to stdout
 void print_pbm(Bit2_T bit2) {
     int rows = Bit2_height(bit2);
     int columns = Bit2_width(bit2);
 
-    printf("P1\n");  // Change to P1 for output
+    printf("P1\n");
     printf("%d %d\n", columns, rows);
 
     for (int i = 0; i < rows; i++) {
