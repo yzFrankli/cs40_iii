@@ -9,9 +9,8 @@
 #ifndef BIT2_INCLUDED
 #define BIT2_INCLUDED
 
-typedef struct Bit2_T *Bit2_T;  // Typedef for the Bit2_T type
+typedef struct Bit2_T *Bit2_T;
 
-// Function declarations
 Bit2_T Bit2_new(int width, int height);
 int Bit2_width(Bit2_T array);
 int Bit2_height(Bit2_T array);
