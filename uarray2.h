@@ -11,9 +11,9 @@
 
 #include <uarray.h>
 
-typedef struct UArray2_T *UArray2_T;  // Define UArray2_T type
+typedef struct UArray2_T *UArray2_T;
 
-// Function declarations for the UArray2 interface
+
 UArray2_T UArray2_new(int width, int height, int element_size);
 void UArray2_free(UArray2_T *uarray2);
 void *UArray2_at(UArray2_T uarray2, int i, int j);
